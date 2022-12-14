@@ -1,0 +1,44 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	background: #303030;
+	color: #ffffff;
+}
+.navbar {
+	width: 100%;
+	height: 90px;
+	background-color: #ac8aea;
+	position: fixed;
+	z-index: 99999999;
+}
+.navbarcontainer[data-container="0"] {
+	position: relative;
+	margin: 10px 10px;
+}
+.content {
+	position: relative;
+	top: 150px;
+}
+#icon {
+	margin: auto;
+	width: 80px;
+}
+.broad {
+	margin: auto;
+	width: 50%;
+}
+.broad img {
+	padding-top: 30px;
+}
+.broad video {
+	padding-top: 30px;
+}
+#download-icon {
+	width: 64px;
+	float: right;
+	clear: both;
+	margin: 12px 0px;
+	position: static;
+}
