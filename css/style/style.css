@@ -48,6 +48,9 @@ body {
 	margin: 12px 0px;
 	position: static;
 }
+a #download-icon {
+    display: inline;
+}
 video {
    width: 100%;
    height: 1000vh;
@@ -55,7 +58,4 @@ video {
 }
 img {
    pointer-events: none;
-}
-a {
-   display: flex;
 }
