@@ -56,3 +56,6 @@ video {
 img {
    pointer-events: none;
 }
+a {
+   display: inline-block;
+}
