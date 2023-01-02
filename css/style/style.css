@@ -37,6 +37,10 @@ body {
 .broad img {
 	padding-top: 30px;
    width: 100%;
+   -webkit-border-radius: 16px;
+   -moz-border-radius: 16px;
+   -o-border-radius: 16px;
+   border-radius: 16px;
 }
 .broad video {
 	padding-top: 30px;
