@@ -60,8 +60,4 @@ video {
 img {
    pointer-events: none;
 }
-.content[data-startplayer="startplayer"] {
-   height: 100vh;
-   position: relative;
-}
    
