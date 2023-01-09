@@ -52,10 +52,16 @@ body {
    display: inline-block;
 }
 video {
+   position: absolute;
    width: 100%;
-   height: 1000vh;
+   height: 100%;
    object-fit: cover;
 }
 img {
    pointer-events: none;
 }
+.content[data-startplayer] {
+   height: 100vh;
+   position: relative;
+}
+   
