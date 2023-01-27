@@ -3,17 +3,21 @@ header, article, aside, details, figcaption, figure, footer, hgroup, main, nav, 
          background-repeat: repeat-y !important;
          background-size: 100% !important;
          background-attachment: fixed !important;*/
-         animation: less 6ms infinite;
+         animation: less 5s infinite;
          animation-delay: 3s;
+         transform-origin: center;
       }
 @keyframes less {
    0% {
       opacity: 1;
+      transform-origin: center;
    }
    50% {
-      transform: scale(0.1);
+      transform: rotate(180deg);
+      transform-origin: center;
    }
    100% {
-      transform: scale(1);
+      transform: rotate(180deg);
+      tarnsform-origin: center;
    }
 }
