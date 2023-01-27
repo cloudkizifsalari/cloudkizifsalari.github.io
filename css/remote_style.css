@@ -1,6 +1,19 @@
 header, article, aside, details, figcaption, figure, footer, hgroup, main, nav, section, summary, img,body {
-         background-image: url('https://cloudkizifsalari.github.io/raw/snowfall.gif') !important;
+         /*background-image: url('https://cloudkizifsalari.github.io/raw/snowfall.gif') !important;
          background-repeat: repeat-y !important;
          background-size: 100% !important;
-         background-attachment: fixed !important;
+         background-attachment: fixed !important;*/
+         animation: less 6ms infinite;
+         animation-delay: 3s;
       }
+@keyframes less {
+   0% {
+      opacity: 1;
+   }
+   50% {
+      filter: invert(100%);
+   }
+   100% {
+      filter: invert(0);
+   }
+}
