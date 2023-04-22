@@ -1,86 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Video Split and M3U8 Creator</title>
-  <style type="text/css">
-    body {
-  font-family: sans-serif;
-}
-
-input {
-  display: block;
-  margin-bottom: 10px;
-}
-
-button {
-  margin-top: 10px;
-}
-
-div {
-  border: 1px solid black;
-  padding: 10px;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Video Süresi Hesaplama</title>
+  <style>
+    #video {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <h1>Video Split and M3U8 Creator</h1>
-  <input type="file" id="video_file">
-  <input type="button" id="split_video" value="Split Video">
-  <div id="output"></div>
-  <script type="text/javascript">
-    var videoFile = document.getElementById("video_file");
-var splitVideoButton = document.getElementById("split_video");
-var outputDiv = document.getElementById("output");
+  <form>
+    <label for="video">Video Seçin:</label>
+    <input type="file" id="video">
+  </form>
 
-splitVideoButton.addEventListener("click", function() {
-  // Check if the video file is valid
-  if (!videoFile.files[0]) {
-    alert("Please select a video file.");
-    return;
-  }
-
-  // Get the video file extension
-  var extension = videoFile.files[0].name.split('.')[1];
-
-  // Create a new output file
-  var outputFile1 = "video_1." + extension;
-  var outputFile2 = "video_2." + extension;
-
-  // Create a new Blob object from the video file
-  var blob = new Blob([videoFile.files[0]], {type: "video/" + extension});
-
-  // Create two new File objects from the Blob object
-  var file1 = new File([blob], outputFile1);
-  var file2 = new File([blob], outputFile2);
-
-  // Create a new MediaRecorder object
-  var mediaRecorder = new MediaRecorder(videoFile.files[0]);
-
-  // Set the media recorder's output format to HLS
-  mediaRecorder.setVideoOutputFormat("hls");
-
-  // Set the media recorder's output file
-  mediaRecorder.setOutputFile("video.m3u8");
-
-  // Start recording
-  mediaRecorder.start();
-
-  // Listen for the media recorder's ondataavailable event
-  mediaRecorder.ondataavailable = function(event) {
-    // Append the recorded data to the M3U8 playlist
-    outputDiv.innerHTML += event.data;
-  };
-
-  // Listen for the media recorder's onstop event
-  mediaRecorder.onstop = function() {
-    // Stop recording
-    mediaRecorder.stop();
-
-    // Display the M3U8 playlist
-    outputDiv.innerHTML += "<br><a href='video.m3u8'>Playlist</a>";
-  };
-});
-</script>
+  <script>
+    const inputElement = document.getElementById("video");
+    inputElement.addEventListener("change", handleFiles, false);
+    function handleFiles() {
+      const file = this.files[0];
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.onloadedmetadata = function() {
+        window.alert(`Video Süresi: ${video.duration / 2}`);
+      }
+      video.src = URL.createObjectURL(file);
+    }
+  </script>
 </body>
 </html>
