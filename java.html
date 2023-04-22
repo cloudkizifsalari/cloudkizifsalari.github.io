@@ -1,43 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Proxy Page</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proxy Site</title>
 </head>
 <body>
-  <h1>Proxy Page</h1>
-  <p>This is a proxy page for the website <a href="https://example.com">example.com</a>.</p>
-  <p>The HTML of the website has been captured and compiled into a static page.</p>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/puppeteer/1.18.1/puppeteer.min.js"></script>
+  <form action="/proxy" method="get">
+    <input type="text" name="url" placeholder="Enter the URL of the website you want to access">
+    <input type="submit" value="Go">
+  </form>
   <script>
-    function main() {
-      // Create a new browser instance
-      const browser = await puppeteer.launch();
-
-      // Go to the website you want to proxy
-      const page = await browser.newPage();
-      await page.goto('https://example.com');
-
-      // Capture the HTML of the page
-      const html = await page.content();
-
-      // Compile the HTML into a static page
-      const server = http.createServer((req, res) => {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(html);
-      });
-
-      // Start the server
-      await server.listen(3000, 'localhost');
-
-      // Wait for the user to press `Ctrl`+`C` to stop the server
-      process.on('SIGINT', () => {
-        server.close();
-        browser.close();
-        process.exit();
-      });
+    function proxy() {
+      var url = document.getElementById("url").value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+          if (xhr.status == 200) {
+            document.getElementById("content").innerHTML = xhr.responseText;
+          } else {
+            alert("Error: " + xhr.status);
+          }
+        }
+      };
+      xhr.send();
     }
-
-    main();
   </script>
+  <div id="content"></div>
 </body>
 </html>
