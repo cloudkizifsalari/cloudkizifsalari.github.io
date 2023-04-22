@@ -1,71 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Video Splitter</title>
-	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			height: 100vh;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-		video {
-			width: 50%;
-		}
-	</style>
-</head>
-<body>
-	<video id="video" controls>
-		<source src="video.mp4" type="video/mp4">
-	</video>
-	<script>
-           // Video elementi seçimi
-const video = document.querySelector('video');
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+<input type="file" id="video-input" accept="video/*">
 
-// Video'nun uzunluğunun yarısını hesaplayın
-const halfDuration = video.duration / 2;
+<script>
+const videoInput = document.getElementById("video-input");
 
-// İlk yarısı için kesme işlemi yapın
-const firstHalfSource = URL.createObjectURL(new Blob([`
-    #EXTM3U
-    #EXT-X-VERSION:3
-    #EXT-X-TARGETDURATION:11
-    #EXT-X-MEDIA-SEQUENCE:0
-    #EXTINF:10.0,
-    ${window.location.href}
-    #EXTINF:${halfDuration},
-    ${window.location.href}
-`], { type: 'application/vnd.apple.mpegurl' }));
+function loadVideo() {
+  const video = document.createElement("video");
+  video.src = URL.createObjectURL(videoInput.files[0]);
+  video.onloadedmetadata = function() {
+    const halfDuration = Math.floor(video.duration / 2);
+    const firstSegment = video.src + "#t=0," + halfDuration;
+    const secondSegment = video.src + "#t=" + halfDuration + ",999999";
+    const firstM3U8 = createM3U8(firstSegment);
+    const secondM3U8 = createM3U8(secondSegment);
+  };
+}
 
-// İkinci yarısı için kesme işlemi yapın
-const secondHalfSource = URL.createObjectURL(new Blob([`
-    #EXTM3U
-    #EXT-X-VERSION:3
-    #EXT-X-TARGETDURATION:11
-    #EXT-X-MEDIA-SEQUENCE:0
-    #EXTINF:${halfDuration},
-    ${window.location.href}
-    #EXTINF:${halfDuration},
-    ${window.location.href}
-`], { type: 'application/vnd.apple.mpegurl' }));
+function createM3U8(videoUrl) {
+  const m3u8Content = "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:10\n#EXT-X-MEDIA-SEQUENCE:0\n#EXTINF:10.0,\n" + videoUrl + "\n#EXT-X-ENDLIST";
+  return m3u8Content;
+}
 
-// M3U8 dosyasını indirmek için indirme bağlantıları oluşturun
-const firstHalfLink = document.createElement('a');
-firstHalfLink.href = firstHalfSource;
-firstHalfLink.download = 'first_half.m3u8';
-
-const secondHalfLink = document.createElement('a');
-secondHalfLink.href = secondHalfSource;
-secondHalfLink.download = 'second_half.m3u8';
-
-// Sayfaya indirme bağlantılarını ekleyin
-document.body.appendChild(firstHalfLink);
-document.body.appendChild(secondHalfLink);
-
-        </script>
+videoInput.addEventListener("change", loadVideo);
+</script>
 </body>
-</html>
+<html>
