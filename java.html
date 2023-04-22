@@ -1,35 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Download Source Code</title>
 </head>
 <body>
-  <h1>Download Source Code</h1>
-  <p>This page allows you to download the source code of a site.</p>
-  <form action="/download" method="post">
-    <input type="text" name="url" placeholder="Enter the URL of the site">
-    <input type="submit" value="Download">
-  </form>
+  <input type="text" id="url">
+  <button onclick="downloadSourceCode()">Download Source Code</button>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
     function downloadSourceCode() {
-      var url = document.getElementById("url").value;
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", url);
-      xhr.onload = function() {
-        if (xhr.status == 200) {
-          var content = xhr.responseText;
+      var url = $("#url").val();
+      $.ajax({
+        url: url,
+        dataType: "text",
+        success: function(content) {
           var blob = new Blob([content], {type: "text/html"});
           var link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
           link.download = "source_code.html";
           link.click();
-        } else {
-          alert("Error downloading source code: " + xhr.status);
         }
-      };
-      xhr.send();
+      });
     }
   </script>
 </body>
