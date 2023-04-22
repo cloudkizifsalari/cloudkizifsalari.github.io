@@ -1,69 +1,53 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Video Bölücü</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<style>
-		.container {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-		}
-		video {
-			max-width: 100%;
-			margin-bottom: 20px;
-		}
-		.button {
-			margin-top: 20px;
-			padding: 10px 20px;
-			background-color: #4CAF50;
-			color: white;
-			border: none;
-			border-radius: 5px;
-			font-size: 16px;
-			cursor: pointer;
-		}
-	</style>
-</head>
 <body>
-	<div class="container">
-		<h1>Video Bölücü</h1>
-		<input type="file" id="video-input">
-		<button class="button" onclick="divideVideo()">Böl</button>
-	</div>
 
-	<script>
-		function divideVideo() {
-			const input = document.getElementById("video-input");
-			const video = input.files[0];
-			const duration = video.duration;
-			const segmentDuration = Math.ceil(duration / 2);
+  <input type="file" id="videoFile">
+  <button onclick="generateM3U8()">M3U8 Oluştur</button>
 
-			const blobUrl = URL.createObjectURL(video);
+  <script>
+    function generateM3U8() {
+      const videoFile = document.getElementById("videoFile").files[0];
+      const video = document.createElement('video');
+      video.src = URL.createObjectURL(videoFile);
+      video.addEventListener('loadedmetadata', function() {
+        const duration = video.duration;
+        const segmentDuration = duration / 2;
+        const segments = [
+          {
+            url: 'segment1.ts',
+            duration: segmentDuration
+          },
+          {
+            url: 'segment2.ts',
+            duration: segmentDuration
+          }
+        ];
+        const m3u8Content = generateM3U8Content(segments);
+        downloadM3U8(m3u8Content);
+      });
+    }
 
-			const playlist = "#EXTM3U\n" +
-			"#EXT-X-VERSION:3\n" +
-			"#EXT-X-TARGETDURATION:" + segmentDuration + "\n" +
-			"#EXT-X-MEDIA-SEQUENCE:0\n" +
-			"#EXTINF:" + segmentDuration + ",\n" +
-			blobUrl + "\n" +
-			"#EXTINF:" + segmentDuration + ",\n" +
-			blobUrl + "\n" +
-			"#EXT-X-ENDLIST";
+    function generateM3U8Content(segments) {
+      let m3u8Content = '#EXTM3U\n';
+      let segmentIndex = 0;
+      segments.forEach(segment => {
+        segmentIndex++;
+        m3u8Content += '#EXTINF:' + segment.duration + ',\n';
+        m3u8Content += 'segment' + segmentIndex + '.ts\n';
+      });
+      return m3u8Content;
+    }
 
-			const blob = new Blob([playlist], { type: "application/x-mpegURL" });
+    function downloadM3U8(content) {
+      const blob = new Blob([content], {type: 'application/vnd.apple.mpegurl'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'video.m3u8';
+      a.click();
+    }
+  </script>
 
-			const url = URL.createObjectURL(blob);
-
-			const a = document.createElement("a");
-			a.href = url;
-			a.download = "video.m3u8";
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-			URL.revokeObjectURL(url);
-		}
-	</script>
 </body>
 </html>
