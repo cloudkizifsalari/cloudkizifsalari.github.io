@@ -1,33 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body>
-<input type="file" id="video-input" accept="video/*">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Split and M3U8 Creator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/file-saver.js/2.0.2/FileSaver.min.js"></script>
+</head>
+<body>
+  <h1>Video Split and M3U8 Creator</h1>
+  <form action="split_video.js" method="post" enctype="multipart/form-data">
+    <input type="file" name="video_file">
+    <input type="submit" value="Split Video">
+  </form>
 
-<script>
-const videoInput = document.getElementById("video-input");
+  <script>
+    function splitVideo(videoFile) {
+  // Check if the video file is valid
+  if (!videoFile) {
+    alert("Please select a video file.");
+    return;
+  }
 
-function loadVideo() {
-  const video = document.createElement("video");
-  video.src = URL.createObjectURL(videoInput.files[0]);
-  video.onloadedmetadata = function() {
-    const halfDuration = Math.floor(video.duration / 2);
-    const firstSegment = video.src + "#t=0," + halfDuration;
-    const secondSegment = video.src + "#t=" + halfDuration + ",999999";
-    const firstM3U8 = createM3U8(firstSegment);
-    const secondM3U8 = createM3U8(secondSegment);
+  // Get the video file extension
+  var extension = videoFile.name.split('.')[1];
+
+  // Create a new output file
+  var outputFile1 = "video_1." + extension;
+  var outputFile2 = "video_2." + extension;
+
+  // Create a new Blob object from the video file
+  var blob = new Blob([videoFile], {type: "video/" + extension});
+
+  // Create two new File objects from the Blob object
+  var file1 = new File([blob], outputFile1);
+  var file2 = new File([blob], outputFile2);
+
+  // Create a new FormData object
+  var formData = new FormData();
+
+  // Add the two files to the FormData object
+  formData.append("video_file_1", file1);
+  formData.append("video_file_2", file2);
+
+  // Create a new XMLHttpRequest object
+  var xhr = new XMLHttpRequest();
+
+  // Set the request method to POST
+  xhr.open("POST", "split_video.php");
+
+  // Set the request body to the FormData object
+  xhr.send(formData);
+
+  // Handle the response
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      // The request was successful
+      var m3u8 = xhr.responseText;
+
+      // Create a new FileSaver object
+      var fileSaver = new FileSaver();
+
+      // Save the M3U8 playlist to a file
+      fileSaver.saveAs(m3u8, "video.m3u8");
+    } else {
+      // The request failed
+      alert("An error occurred.");
+    }
   };
 }
-
-function createM3U8(videoUrl) {
-  const m3u8Content = "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:10\n#EXT-X-MEDIA-SEQUENCE:0\n#EXTINF:10.0,\n" + videoUrl + "\n#EXT-X-ENDLIST";
-  return m3u8Content;
-}
-
-videoInput.addEventListener("change", loadVideo);
 </script>
+ 
 </body>
 </html>
