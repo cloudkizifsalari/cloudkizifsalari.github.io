@@ -1,32 +1,69 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Video Süresi Hesaplama</title>
-  <style>
-    #video {
-      display: none;
-    }
-  </style>
+	<title>Video Bölücü</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		.container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		video {
+			max-width: 100%;
+			margin-bottom: 20px;
+		}
+		.button {
+			margin-top: 20px;
+			padding: 10px 20px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			font-size: 16px;
+			cursor: pointer;
+		}
+	</style>
 </head>
 <body>
-  <form>
-    <label for="video">Video Seçin:</label>
-    <input type="file" id="video">
-  </form>
+	<div class="container">
+		<h1>Video Bölücü</h1>
+		<input type="file" id="video-input">
+		<button class="button" onclick="divideVideo()">Böl</button>
+	</div>
 
-  <script>
-    const inputElement = document.getElementById("video");
-    inputElement.addEventListener("change", handleFiles, false);
-    function handleFiles() {
-      const file = this.files[0];
-      const video = document.createElement("video");
-      video.preload = "metadata";
-      video.onloadedmetadata = function() {
-        window.alert(`Video Süresi: ${video.duration / 2}`);
-      }
-      video.src = URL.createObjectURL(file);
-    }
-  </script>
+	<script>
+		function divideVideo() {
+			const input = document.getElementById("video-input");
+			const video = input.files[0];
+			const duration = video.duration;
+			const segmentDuration = Math.ceil(duration / 2);
+
+			const blobUrl = URL.createObjectURL(video);
+
+			const playlist = "#EXTM3U\n" +
+			"#EXT-X-VERSION:3\n" +
+			"#EXT-X-TARGETDURATION:" + segmentDuration + "\n" +
+			"#EXT-X-MEDIA-SEQUENCE:0\n" +
+			"#EXTINF:" + segmentDuration + ",\n" +
+			blobUrl + "\n" +
+			"#EXTINF:" + segmentDuration + ",\n" +
+			blobUrl + "\n" +
+			"#EXT-X-ENDLIST";
+
+			const blob = new Blob([playlist], { type: "application/x-mpegURL" });
+
+			const url = URL.createObjectURL(blob);
+
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "video.m3u8";
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		}
+	</script>
 </body>
 </html>
