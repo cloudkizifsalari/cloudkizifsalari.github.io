@@ -3,30 +3,69 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proxy Site</title>
+	<title>Video Splitter</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		video {
+			width: 50%;
+		}
+	</style>
 </head>
 <body>
-  <form action="/proxy" method="get">
-    <input type="text" name="url" placeholder="Enter the URL of the website you want to access">
-    <input type="submit" value="Go">
-  </form>
-  <script>
-    function proxy() {
-      var url = document.getElementById("url").value;
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", url, true);
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
-          if (xhr.status == 200) {
-            document.getElementById("content").innerHTML = xhr.responseText;
-          } else {
-            alert("Error: " + xhr.status);
-          }
-        }
-      };
-      xhr.send();
-    }
-  </script>
-  <div id="content"></div>
+	<video id="video" controls>
+		<source src="video.mp4" type="video/mp4">
+	</video>
+	<script>
+           // Video elementi seçimi
+const video = document.querySelector('video');
+
+// Video'nun uzunluğunun yarısını hesaplayın
+const halfDuration = video.duration / 2;
+
+// İlk yarısı için kesme işlemi yapın
+const firstHalfSource = URL.createObjectURL(new Blob([`
+    #EXTM3U
+    #EXT-X-VERSION:3
+    #EXT-X-TARGETDURATION:11
+    #EXT-X-MEDIA-SEQUENCE:0
+    #EXTINF:10.0,
+    ${window.location.href}
+    #EXTINF:${halfDuration},
+    ${window.location.href}
+`], { type: 'application/vnd.apple.mpegurl' }));
+
+// İkinci yarısı için kesme işlemi yapın
+const secondHalfSource = URL.createObjectURL(new Blob([`
+    #EXTM3U
+    #EXT-X-VERSION:3
+    #EXT-X-TARGETDURATION:11
+    #EXT-X-MEDIA-SEQUENCE:0
+    #EXTINF:${halfDuration},
+    ${window.location.href}
+    #EXTINF:${halfDuration},
+    ${window.location.href}
+`], { type: 'application/vnd.apple.mpegurl' }));
+
+// M3U8 dosyasını indirmek için indirme bağlantıları oluşturun
+const firstHalfLink = document.createElement('a');
+firstHalfLink.href = firstHalfSource;
+firstHalfLink.download = 'first_half.m3u8';
+
+const secondHalfLink = document.createElement('a');
+secondHalfLink.href = secondHalfSource;
+secondHalfLink.download = 'second_half.m3u8';
+
+// Sayfaya indirme bağlantılarını ekleyin
+document.body.appendChild(firstHalfLink);
+document.body.appendChild(secondHalfLink);
+
+        </script>
 </body>
 </html>
