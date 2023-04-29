@@ -1,53 +1,15 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>MP3 Kbps Düşürme</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 <body>
-
-  <input type="file" id="videoFile">
-  <button onclick="generateM3U8()">M3U8 Oluştur</button>
-
-  <script>
-    function generateM3U8() {
-      const videoFile = document.getElementById("videoFile").files[0];
-      const video = document.createElement('video');
-      video.src = URL.createObjectURL(videoFile);
-      video.addEventListener('loadedmetadata', function() {
-        const duration = video.duration;
-        const segmentDuration = duration / 2;
-        const segments = [
-          {
-            url: 'segment1.ts',
-            duration: segmentDuration
-          },
-          {
-            url: 'segment2.ts',
-            duration: segmentDuration
-          }
-        ];
-        const m3u8Content = generateM3U8Content(segments);
-        downloadM3U8(m3u8Content);
-      });
-    }
-
-    function generateM3U8Content(segments) {
-      let m3u8Content = '#EXTM3U\n';
-      let segmentIndex = 0;
-      segments.forEach(segment => {
-        segmentIndex++;
-        m3u8Content += '#EXTINF:' + segment.duration + ',\n';
-        m3u8Content += 'segment' + segmentIndex + '.ts\n';
-      });
-      return m3u8Content;
-    }
-
-    function downloadM3U8(content) {
-      const blob = new Blob([content], {type: 'application/vnd.apple.mpegurl'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'video.m3u8';
-      a.click();
-    }
-  </script>
+  <input type="file" id="mp3Dosyasi" accept=".mp3">
+  <button onclick="mp3DosyasiniDusur()">Kbps Düşür</button>
+  <script src="data:text/javascript,function%20mp3DosyasiniDusur()%20%7B%20%20%20const%20mp3Dosyasi%20%3D%20document.getElementById('mp3Dosyasi').files%5B0%5D%3B%20%20%20const%20xhr%20%3D%20new%20XMLHttpRequest()%3B%20%20%20xhr.open('GET'%2C%20URL.createObjectURL(mp3Dosyasi)%2C%20true)%3B%20%20%20xhr.responseType%20%3D%20'arraybuffer'%3B%20%20%20xhr.onload%20%3D%20function()%20%7B%20%20%20%20%20if%20(xhr.status%20%3D%3D%3D%20200)%20%7B%20%20%20%20%20%20%20const%20sesKonteksi%20%3D%20new%20AudioContext()%3B%20%20%20%20%20%20%20sesKonteksi.decodeAudioData(xhr.response%2C%20function(decodedData)%20%7B%20%20%20%20%20%20%20%20%20const%20yeniKbps%20%3D%2064%3B%20%2F%2F%20Yeni%20Kbps%20h%C4%B1z%C4%B1n%C4%B1%20burada%20belirleyin%20%20%20%20%20%20%20%20%20const%20kaynak%20%3D%20sesKonteksi.createBufferSource()%3B%20%20%20%20%20%20%20%20%20kaynak.buffer%20%3D%20decodedData%3B%20%20%20%20%20%20%20%20%20const%20kbpsDusurucu%20%3D%20sesKonteksi.createScriptProcessor(0%2C%201%2C%201)%3B%20%20%20%20%20%20%20%20%20kbpsDusurucu.buffer%20%3D%20kaynak.buffer%3B%20%20%20%20%20%20%20%20%20kbpsDusurucu.onaudioprocess%20%3D%20function(e)%20%7B%20%20%20%20%20%20%20%20%20%20%20const%20girisKanal%20%3D%20e.inputBuffer.getChannelData(0)%3B%20%20%20%20%20%20%20%20%20%20%20const%20cikisKanal%20%3D%20e.outputBuffer.getChannelData(0)%3B%20%20%20%20%20%20%20%20%20%20%20for%20(let%20i%20%3D%200%3B%20i%20%3C%20girisKanal.length%3B%20i%2B%2B)%20%7B%20%20%20%20%20%20%20%20%20%20%20%20%20cikisKanal%5Bi%5D%20%3D%20girisKanal%5Bi%5D%3B%20%20%20%20%20%20%20%20%20%20%20%20%20if%20(i%20%25%20yeniKbps%20!%3D%3D%200)%20%7B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20cikisKanal%5Bi%5D%20%3D%200%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%20%20%20%20%20%20%20%20%20%20%20%7D%20%20%20%20%20%20%20%20%20%7D%3B%20%20%20%20%20%20%20%20%20kaynak.connect(kbpsDusurucu)%3B%20%20%20%20%20%20%20%20%20kbpsDusurucu.connect(sesKonteksi.destination)%3B%20%20%20%20%20%20%20%20%20kaynak.start(0)%3B%20%20%20%20%20%20%20%7D)%3B%20%20%20%20%20%7D%20%20%20%7D%3B%20%20%20xhr.send()%3B%20%7D"></script>
+  <script src="https://unpkg.com/tone"></script>
 
 </body>
 </html>
