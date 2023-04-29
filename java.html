@@ -1,15 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MP3 Kbps Düşürme</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reduce MP3 Kbps Speed to 8-bit</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-  <input type="file" id="mp3Dosyasi" accept=".mp3">
-  <button onclick="mp3DosyasiniDusur()">Kbps Düşür</button>
-  <script src="data:text/javascript,function%20mp3DosyasiniDusur()%20%7B%20%20%20const%20mp3Dosyasi%20%3D%20document.getElementById('mp3Dosyasi').files%5B0%5D%3B%20%20%20const%20xhr%20%3D%20new%20XMLHttpRequest()%3B%20%20%20xhr.open('GET'%2C%20URL.createObjectURL(mp3Dosyasi)%2C%20true)%3B%20%20%20xhr.responseType%20%3D%20'arraybuffer'%3B%20%20%20xhr.onload%20%3D%20function()%20%7B%20%20%20%20%20if%20(xhr.status%20%3D%3D%3D%20200)%20%7B%20%20%20%20%20%20%20const%20sesKonteksi%20%3D%20new%20AudioContext()%3B%20%20%20%20%20%20%20sesKonteksi.decodeAudioData(xhr.response%2C%20function(decodedData)%20%7B%20%20%20%20%20%20%20%20%20const%20yeniKbps%20%3D%2064%3B%20%2F%2F%20Yeni%20Kbps%20h%C4%B1z%C4%B1n%C4%B1%20burada%20belirleyin%20%20%20%20%20%20%20%20%20const%20kaynak%20%3D%20sesKonteksi.createBufferSource()%3B%20%20%20%20%20%20%20%20%20kaynak.buffer%20%3D%20decodedData%3B%20%20%20%20%20%20%20%20%20const%20kbpsDusurucu%20%3D%20sesKonteksi.createScriptProcessor(0%2C%201%2C%201)%3B%20%20%20%20%20%20%20%20%20kbpsDusurucu.buffer%20%3D%20kaynak.buffer%3B%20%20%20%20%20%20%20%20%20kbpsDusurucu.onaudioprocess%20%3D%20function(e)%20%7B%20%20%20%20%20%20%20%20%20%20%20const%20girisKanal%20%3D%20e.inputBuffer.getChannelData(0)%3B%20%20%20%20%20%20%20%20%20%20%20const%20cikisKanal%20%3D%20e.outputBuffer.getChannelData(0)%3B%20%20%20%20%20%20%20%20%20%20%20for%20(let%20i%20%3D%200%3B%20i%20%3C%20girisKanal.length%3B%20i%2B%2B)%20%7B%20%20%20%20%20%20%20%20%20%20%20%20%20cikisKanal%5Bi%5D%20%3D%20girisKanal%5Bi%5D%3B%20%20%20%20%20%20%20%20%20%20%20%20%20if%20(i%20%25%20yeniKbps%20!%3D%3D%200)%20%7B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20cikisKanal%5Bi%5D%20%3D%200%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%20%20%20%20%20%20%20%20%20%20%20%7D%20%20%20%20%20%20%20%20%20%7D%3B%20%20%20%20%20%20%20%20%20kaynak.connect(kbpsDusurucu)%3B%20%20%20%20%20%20%20%20%20kbpsDusurucu.connect(sesKonteksi.destination)%3B%20%20%20%20%20%20%20%20%20kaynak.start(0)%3B%20%20%20%20%20%20%20%7D)%3B%20%20%20%20%20%7D%20%20%20%7D%3B%20%20%20xhr.send()%3B%20%7D"></script>
-  <script src="https://unpkg.com/tone"></script>
+  <input type="file" id="mp3File" />
+  <button onclick="reduceKbps()">Reduce Kbps</button>
+  <div id="output"></div>
 
+  <script>
+    function reduceKbps() {
+      var mp3File = document.getElementById("mp3File");
+      var output = document.getElementById("output");
+
+      // Check if a file was selected
+      if (mp3File.files.length === 0) {
+        output.innerHTML = "Please select an MP3 file.";
+        return;
+      }
+
+      // Get the file name and extension
+      var fileName = mp3File.files[0].name;
+      var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+
+      // Check if the file is an MP3 file
+      if (extension !== "mp3") {
+        output.innerHTML = "The selected file is not an MP3 file.";
+        return;
+      }
+
+      // Create a new XMLHttpRequest object
+      var xhr = new XMLHttpRequest();
+
+      // Set the request method to "POST"
+      xhr.open("POST", "/reduce-kbps");
+
+      // Set the request headers
+      xhr.setRequestHeader("Content-Type", "multipart/form-data");
+
+      // Add the file to the request body
+      var fileData = new FormData();
+      fileData.append("mp3File", mp3File.files[0]);
+      xhr.send(fileData);
+
+      // Handle the response
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var response = JSON.parse(xhr.responseText);
+          if (response.success) {
+            output.innerHTML = "The file has been successfully reduced to 8-bit.";
+          } else {
+            output.innerHTML = response.error;
+          }
+        } else {
+          output.innerHTML = "An error occurred while reducing the file.";
+        }
+      };
+    }
+  </script>
 </body>
 </html>
